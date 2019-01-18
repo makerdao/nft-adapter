@@ -2,13 +2,13 @@ pragma solidity ^0.4.24;
 
 import "ds-test/test.sol";
 
-import "./NftAdapter.sol";
+import "./NFTAdapter.sol";
 
-contract NftAdapterTest is DSTest {
-    NftAdapter adapter;
+contract NFTAdapterTest is DSTest {
+    NFTAdapter adapter;
 
     function setUp() public {
-        adapter = new NftAdapter();
+        adapter = new NFTAdapter();
     }
 
     function testFail_basic_sanity() public {
