@@ -23,16 +23,18 @@ contract NFTAdapter is DSNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike public gem;
+    uint256 public obj;
 
     int256 constant ONE = 10 ** 45;
 
-    constructor(address vat_, bytes32 ilk_, address gem_) public {
+    constructor(address vat_, bytes32 ilk_, address gem_, uint256 obj_) public {
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike(gem_);
+        obj = obj_;
     }
 
-    function join(bytes32 urn, uint256 obj) external note {
+    function join(bytes32 urn) external note {
         require(bytes20(urn) == bytes20(msg.sender));
         gem.transferFrom(msg.sender, address(this), obj);
         vat.slip(ilk, urn, ONE);
