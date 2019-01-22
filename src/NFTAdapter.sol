@@ -27,9 +27,9 @@ contract NFTAdapter is DSNote {
 
     int256 constant ONE = 10 ** 45;
 
-    constructor(address vat_, bytes32 ilk_, address gem_, uint256 obj_) public {
+    constructor(address vat_, address gem_, uint256 obj_) public {
         vat = VatLike(vat_);
-        ilk = ilk_;
+        ilk = bytes32(obj_);
         gem = GemLike(gem_);
         obj = obj_;
     }

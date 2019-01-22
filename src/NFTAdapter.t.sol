@@ -48,19 +48,20 @@ contract NFTAdapterTest is DSTest {
     TestUser       usr;
     Vat            vat;
 
-    bytes32 constant ilk     = "nft";
+    bytes32 ilk;
+
     uint256 constant ONE     = 10 ** 45;
     uint256 constant tokenId = 42;
 
     function setUp() public {
         vat = new Vat();
-        vat.init(ilk);
-
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
-        ptr = new NFTAdapter(address(vat), ilk, address(gem), tokenId);
+        ptr = new NFTAdapter(address(vat), address(gem), tokenId);
         usr = new TestUser(nft, ptr);
+        ilk = bytes32(tokenId);
 
+        vat.init(ilk);
         vat.rely(address(ptr));
         nft.mint(address(usr), tokenId);
         usr.approve(address(ptr), tokenId);
