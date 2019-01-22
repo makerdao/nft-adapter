@@ -21,31 +21,27 @@ import "ds-note/note.sol";
 
 contract NFTAdapter is DSNote {
     VatLike public vat;
-    bytes32 public ilk;
     GemLike public gem;
-    uint256 public obj;
 
     int256 constant ONE = 10 ** 45;
 
-    constructor(address vat_, address gem_, uint256 obj_) public {
+    constructor(address vat_, address gem_) public {
         vat = VatLike(vat_);
-        ilk = bytes32(obj_);
         gem = GemLike(gem_);
-        obj = obj_;
     }
 
-    function join(bytes32 urn) external note {
+    function join(bytes32 urn, uint256 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(msg.sender, address(this), obj);
-        vat.slip(ilk, urn,  ONE);
+        vat.slip(bytes32(obj), urn,  ONE);
     }
 
     function exit(bytes32 urn, uint256 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.safeTransferFrom(address(this), msg.sender, obj);
-        vat.slip(ilk, urn, -ONE);
+        vat.slip(bytes32(obj), urn, -ONE);
     }
 }
 

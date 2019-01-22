@@ -36,8 +36,8 @@ contract TestUser {
         nft.approve(to, tokenId);
     }
 
-    function join() public {
-        ptr.join(bytes32(bytes20(address(this))));
+    function join(uint256 tokenId) public {
+        ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
 }
 
@@ -57,7 +57,7 @@ contract NFTAdapterTest is DSTest {
         vat = new Vat();
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
-        ptr = new NFTAdapter(address(vat), address(gem), tokenId);
+        ptr = new NFTAdapter(address(vat), address(gem));
         usr = new TestUser(nft, ptr);
         ilk = bytes32(tokenId);
 
@@ -72,7 +72,7 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
 
-        usr.join();
+        usr.join(tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
