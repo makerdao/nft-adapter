@@ -39,6 +39,14 @@ contract TestUser {
     function join(uint256 tokenId) public {
         ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
+
+    function exit(uint256 tokenId) public {
+        ptr.exit(bytes32(bytes20(address(this))), tokenId);
+    }
+
+    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4) {
+      return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
+    }
 }
 
 contract NFTAdapterTest is DSTest {
@@ -77,5 +85,11 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
         assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), ONE);
+
+        usr.exit(tokenId);
+
+        assertEq(nft.balanceOf(address(usr)), 1);
+        assertEq(nft.balanceOf(address(ptr)), 0);
+        assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
     }
 }
