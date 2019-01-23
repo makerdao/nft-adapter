@@ -57,6 +57,7 @@ contract NFTAdapterTest is DSTest {
     Vat            vat;
 
     bytes32 ilk;
+    bytes32 urn;
 
     bytes32 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
@@ -69,6 +70,7 @@ contract NFTAdapterTest is DSTest {
         ptr = new NFTAdapter(address(vat), address(gem));
         usr = new TestUser(nft, ptr);
         ilk = ilkName(kin, tokenId);
+        urn = bytes32(bytes20(address(usr)));
 
         vat.init(ilk);
         vat.rely(address(ptr));
@@ -79,19 +81,19 @@ contract NFTAdapterTest is DSTest {
     function test_balance() public {
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
-        assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
+        assertEq(vat.gem(ilk, urn), 0);
 
         usr.join(ilk, tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
-        assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), ONE);
+        assertEq(vat.gem(ilk, urn), ONE);
 
         usr.exit(ilk, tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
-        assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
+        assertEq(vat.gem(ilk, urn), 0);
     }
 
     function ilkName(bytes32 kin, uint256 obj) private pure returns (bytes32 ilk) {
