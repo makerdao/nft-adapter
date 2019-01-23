@@ -30,18 +30,18 @@ contract NFTAdapter is DSNote {
         gem = GemLike(gem_);
     }
 
-    function join(bytes32 urn, uint256 obj) external note {
+    function join(bytes32 ilk, bytes32 urn, uint256 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(msg.sender, address(this), obj);
-        vat.slip(bytes32(obj), urn,  ONE);
+        vat.slip(ilk, urn, ONE);
     }
 
-    function exit(bytes32 urn, uint256 obj) external note {
+    function exit(bytes32 ilk, bytes32 urn, uint256 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.safeTransferFrom(address(this), msg.sender, obj);
-        vat.slip(bytes32(obj), urn, -ONE);
+        vat.slip(ilk, urn, -ONE);
     }
 }
 

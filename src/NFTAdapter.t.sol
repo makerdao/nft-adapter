@@ -36,12 +36,12 @@ contract TestUser {
         nft.approve(to, tokenId);
     }
 
-    function join(uint256 tokenId) public {
-        ptr.join(bytes32(bytes20(address(this))), tokenId);
+    function join(bytes32 ilk, uint256 tokenId) public {
+        ptr.join(ilk, bytes32(bytes20(address(this))), tokenId);
     }
 
-    function exit(uint256 tokenId) public {
-        ptr.exit(bytes32(bytes20(address(this))), tokenId);
+    function exit(bytes32 ilk, uint256 tokenId) public {
+        ptr.exit(ilk, bytes32(bytes20(address(this))), tokenId);
     }
 
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4) {
@@ -58,6 +58,7 @@ contract NFTAdapterTest is DSTest {
 
     bytes32 ilk;
 
+    bytes32 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
     uint256 constant tokenId = 42;
 
@@ -67,7 +68,7 @@ contract NFTAdapterTest is DSTest {
         gem = GemLike(address(nft));
         ptr = new NFTAdapter(address(vat), address(gem));
         usr = new TestUser(nft, ptr);
-        ilk = bytes32(tokenId);
+        ilk = ilkName(kin, tokenId);
 
         vat.init(ilk);
         vat.rely(address(ptr));
@@ -80,16 +81,20 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
 
-        usr.join(tokenId);
+        usr.join(ilk, tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
         assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), ONE);
 
-        usr.exit(tokenId);
+        usr.exit(ilk, tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, bytes32(bytes20(address(usr)))), 0);
+    }
+
+    function ilkName(bytes32 kin, uint256 obj) private pure returns (bytes32 ilk) {
+      ilk = keccak256(abi.encodePacked(kin, bytes32(obj)));
     }
 }
