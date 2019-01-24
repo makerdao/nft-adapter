@@ -36,12 +36,12 @@ contract TestUser {
         nft.approve(to, tokenId);
     }
 
-    function join(bytes32 ilk, uint256 tokenId) public {
-        ptr.join(ilk, bytes32(bytes20(address(this))), tokenId);
+    function join(uint256 tokenId) public {
+        ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
 
-    function exit(bytes32 ilk, uint256 tokenId) public {
-        ptr.exit(ilk, bytes32(bytes20(address(this))), tokenId);
+    function exit(uint256 tokenId) public {
+        ptr.exit(bytes32(bytes20(address(this))), tokenId);
     }
 
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4) {
@@ -65,11 +65,11 @@ contract NFTAdapterTest is DSTest {
 
     function setUp() public {
         vat = new Vat();
+        ilk = ilkName(kin, tokenId);
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
-        ptr = new NFTAdapter(address(vat), address(gem));
+        ptr = new NFTAdapter(address(vat), kin, address(gem));
         usr = new TestUser(nft, ptr);
-        ilk = ilkName(kin, tokenId);
         urn = bytes32(bytes20(address(usr)));
 
         vat.init(ilk);
@@ -83,13 +83,13 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, urn), 0);
 
-        usr.join(ilk, tokenId);
+        usr.join(tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
         assertEq(vat.gem(ilk, urn), ONE);
 
-        usr.exit(ilk, tokenId);
+        usr.exit(tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
