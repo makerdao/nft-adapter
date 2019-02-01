@@ -32,15 +32,15 @@ contract TestUser {
         ptr = ptr_;
     }
 
-    function approve(address to, uint256 tokenId) public {
+    function approve(address to, uint160 tokenId) public {
         nft.approve(to, tokenId);
     }
 
-    function join(uint256 tokenId) public {
+    function join(uint160 tokenId) public {
         ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
 
-    function exit(uint256 tokenId) public {
+    function exit(uint160 tokenId) public {
         ptr.exit(bytes32(bytes20(address(this))), tokenId);
     }
 
@@ -59,9 +59,9 @@ contract NFTAdapterTest is DSTest {
     bytes32 ilk;
     bytes32 urn;
 
-    bytes32 constant kin     = "fnord";
+    bytes12 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
-    uint256 constant tokenId = 42;
+    uint160 constant tokenId = 42;
 
     function setUp() public {
         vat = new Vat();
@@ -96,7 +96,9 @@ contract NFTAdapterTest is DSTest {
         assertEq(vat.gem(ilk, urn), 0);
     }
 
-    function ilkName(bytes32 kin, uint256 obj) private pure returns (bytes32 ilk) {
-      ilk = keccak256(abi.encodePacked(kin, bytes32(obj)));
+    // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
+    // a bug in hevm around `library` contracts and inheritance.
+    function ilkName(bytes12 kin, uint160 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(obj));
     }
 }

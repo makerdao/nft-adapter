@@ -21,33 +21,33 @@ import "ds-note/note.sol";
 
 contract NFTAdapter is DSNote {
     VatLike public vat;
-    bytes32 public kin;
+    bytes12 public kin;
     GemLike public gem;
 
     int256 constant ONE = 10 ** 45;
 
-    constructor(address vat_, bytes32 kin_, address gem_) public {
+    constructor(address vat_, bytes12 kin_, address gem_) public {
         vat = VatLike(vat_);
         kin = kin_;
         gem = GemLike(gem_);
     }
 
-    function join(bytes32 urn, uint256 obj) external note {
+    function join(bytes32 urn, uint160 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(msg.sender, address(this), obj);
         vat.slip(ilkName(kin, obj), urn,  ONE);
     }
 
-    function exit(bytes32 urn, uint256 obj) external note {
+    function exit(bytes32 urn, uint160 obj) external note {
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(address(this), msg.sender, obj);
         vat.slip(ilkName(kin, obj), urn, -ONE);
     }
 
-    function ilkName(bytes32 kin, uint256 obj) internal pure returns (bytes32 ilk) {
-        ilk = keccak256(abi.encodePacked(kin, bytes32(obj)));
+    function ilkName(bytes12 kin, uint160 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(obj));
     }
 }
 
