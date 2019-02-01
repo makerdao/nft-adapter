@@ -21,12 +21,12 @@ import "ds-note/note.sol";
 
 contract NFTAdapter is DSNote {
     VatLike public vat;
-    bytes32 public kin;
+    bytes12 public kin;
     GemLike public gem;
 
     int256 constant ONE = 10 ** 45;
 
-    constructor(address vat_, bytes32 kin_, address gem_) public {
+    constructor(address vat_, bytes12 kin_, address gem_) public {
         vat = VatLike(vat_);
         kin = kin_;
         gem = GemLike(gem_);
@@ -46,8 +46,12 @@ contract NFTAdapter is DSNote {
         vat.slip(ilkName(kin, obj), urn, -ONE);
     }
 
-    function ilkName(bytes32 kin, uint256 obj) internal pure returns (bytes32 ilk) {
-        ilk = keccak256(abi.encodePacked(kin, bytes32(obj)));
+    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
+    }
+
+    function foo() internal {
+        bytes1 x = 0;
     }
 }
 

@@ -49,7 +49,7 @@ contract TestUser {
     }
 }
 
-contract NFTAdapterTest is DSTest {
+contract NFTAdapterTest is DSTest, NFTAdapter {
     ERC721Mintable nft;
     GemLike        gem;
     NFTAdapter     ptr;
@@ -59,7 +59,7 @@ contract NFTAdapterTest is DSTest {
     bytes32 ilk;
     bytes32 urn;
 
-    bytes32 constant kin     = "fnord";
+    bytes12 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
     uint256 constant tokenId = 42;
 
@@ -96,7 +96,7 @@ contract NFTAdapterTest is DSTest {
         assertEq(vat.gem(ilk, urn), 0);
     }
 
-    function ilkName(bytes32 kin, uint256 obj) private pure returns (bytes32 ilk) {
-      ilk = keccak256(abi.encodePacked(kin, bytes32(obj)));
+    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
