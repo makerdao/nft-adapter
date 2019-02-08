@@ -40,8 +40,8 @@ contract TestUser {
         ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
 
-    function exit(uint160 tokenId) public {
-        ptr.exit(bytes32(bytes20(address(this))), tokenId);
+    function exit(uint160 tokenId, address pal) public {
+        ptr.exit(bytes32(bytes20(address(this))), pal, tokenId);
     }
 
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4) {
@@ -89,11 +89,21 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 1);
         assertEq(vat.gem(ilk, urn), ONE);
 
-        usr.exit(tokenId);
+        usr.exit(tokenId, address(usr));
 
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, urn), 0);
+    }
+
+    function test_gift() public {
+        TestUser pal = new TestUser(nft, ptr);
+        assertEq(nft.balanceOf(address(pal)), 0);
+
+        usr.join(tokenId);
+        usr.exit(tokenId, address(pal));
+
+        assertEq(nft.balanceOf(address(pal)), 1);
     }
 
     // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
