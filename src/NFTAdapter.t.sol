@@ -108,7 +108,7 @@ contract NFTAdapterTest is DSTest {
 
     // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
     // a bug in hevm around `library` contracts and inheritance.
-    function ilkName(bytes12 kin, uint160 obj) internal pure returns (bytes32 ilk) {
-        ilk = bytes32(uint256(bytes32(kin)) + uint256(obj));
+    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
