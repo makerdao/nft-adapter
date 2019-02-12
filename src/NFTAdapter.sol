@@ -49,7 +49,7 @@ contract NFTAdapter is DSNote {
     bytes12 public kin;
     GemLike public gem;
 
-    int256 constant ONE = 10 ** 45;
+    int256 constant ONE = 10 ** 45; // rad
 
     constructor(address vat_, bytes12 kin_, address gem_) public {
         vat = VatLike(vat_);
