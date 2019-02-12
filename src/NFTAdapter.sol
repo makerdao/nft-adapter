@@ -49,7 +49,7 @@ contract NFTAdapter is DSNote {
     bytes12 public kin;
     GemLike public gem;
 
-    int256 constant ONE = 10 ** 45;
+    int256 constant ONE = 10 ** 45; // rad
 
     constructor(address vat_, bytes12 kin_, address gem_) public {
         vat = VatLike(vat_);
@@ -57,22 +57,25 @@ contract NFTAdapter is DSNote {
         gem = GemLike(gem_);
     }
 
-    function join(bytes32 urn, uint160 obj) external note {
+    function join(bytes32 urn, uint256 obj) external note {
+        require(uint256(uint160(obj)) == obj);
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(msg.sender, address(this), obj);
         vat.slip(ilkName(kin, obj), urn,  ONE);
     }
 
-    function exit(bytes32 urn, address guy, uint160 obj) external note {
+    function exit(bytes32 urn, address guy, uint256 obj) external note {
+        require(uint256(uint160(obj)) == obj);
         require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(address(this), guy, obj);
         vat.slip(ilkName(kin, obj), urn, -ONE);
     }
 
-    function ilkName(bytes12 kin, uint160 obj) internal pure returns (bytes32 ilk) {
-        ilk = bytes32(uint256(bytes32(kin)) + uint256(obj));
+    // the ilk name is the concatenation of 12 bytes of kin + 20 bytes of obj
+    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
 

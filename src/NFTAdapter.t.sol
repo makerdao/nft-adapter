@@ -32,15 +32,15 @@ contract TestUser {
         ptr = ptr_;
     }
 
-    function approve(address to, uint160 tokenId) public {
+    function approve(address to, uint256 tokenId) public {
         nft.approve(to, tokenId);
     }
 
-    function join(uint160 tokenId) public {
+    function join(uint256 tokenId) public {
         ptr.join(bytes32(bytes20(address(this))), tokenId);
     }
 
-    function exit(uint160 tokenId, address pal) public {
+    function exit(uint256 tokenId, address pal) public {
         ptr.exit(bytes32(bytes20(address(this))), pal, tokenId);
     }
 
@@ -61,11 +61,11 @@ contract NFTAdapterTest is DSTest {
 
     bytes12 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
-    uint160 constant tokenId = 42;
+    uint256 constant tokenId = 42;
 
     function setUp() public {
         vat = new Vat();
-        ilk = ilkName(kin, tokenId);
+        ilk = ilkName(kin, uint160(tokenId));
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
         ptr = new NFTAdapter(address(vat), kin, address(gem));
@@ -108,7 +108,7 @@ contract NFTAdapterTest is DSTest {
 
     // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
     // a bug in hevm around `library` contracts and inheritance.
-    function ilkName(bytes12 kin, uint160 obj) internal pure returns (bytes32 ilk) {
-        ilk = bytes32(uint256(bytes32(kin)) + uint256(obj));
+    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
