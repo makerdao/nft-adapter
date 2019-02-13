@@ -58,15 +58,15 @@ contract NFTAdapter is DSNote {
     }
 
     function join(bytes32 urn, uint256 obj) external note {
-        require(uint256(uint160(obj)) == obj);
+        require(uint256(uint160(obj)) == obj, "obj-overflow");
 
         gem.transferFrom(msg.sender, address(this), obj);
         vat.slip(ilkName(kin, obj), urn,  ONE);
     }
 
     function exit(bytes32 urn, address guy, uint256 obj) external note {
-        require(uint256(uint160(obj)) == obj);
-        require(bytes20(urn) == bytes20(msg.sender));
+        require(uint256(uint160(obj)) == obj, "obj-overflow");
+        require(bytes20(urn) == bytes20(msg.sender), "not-owner");
 
         gem.transferFrom(address(this), guy, obj);
         vat.slip(ilkName(kin, obj), urn, -ONE);
