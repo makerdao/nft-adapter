@@ -73,7 +73,7 @@ contract NFTAdapter is DSNote {
     }
 
     // the ilk name is the concatenation of 12 bytes of kin + 20 bytes of obj
-    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
+    function ilkName(bytes12 kin, uint256 obj) public pure returns (bytes32 ilk) {
         ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
