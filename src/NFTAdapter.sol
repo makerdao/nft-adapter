@@ -59,7 +59,6 @@ contract NFTAdapter is DSNote {
 
     function join(bytes32 urn, uint256 obj) external note {
         require(uint256(uint160(obj)) == obj);
-        require(bytes20(urn) == bytes20(msg.sender));
 
         gem.transferFrom(msg.sender, address(this), obj);
         vat.slip(ilkName(kin, obj), urn,  ONE);

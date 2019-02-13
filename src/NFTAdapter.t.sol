@@ -36,8 +36,8 @@ contract TestUser {
         nft.approve(to, tokenId);
     }
 
-    function join(uint256 tokenId) public {
-        ptr.join(bytes32(bytes20(address(this))), tokenId);
+    function join(bytes32 urn, uint256 tokenId) public {
+        ptr.join(urn, tokenId);
     }
 
     function exit(uint256 tokenId, address pal) public {
@@ -83,7 +83,7 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, urn), 0);
 
-        usr.join(tokenId);
+        usr.join(urn, tokenId);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
@@ -100,10 +100,21 @@ contract NFTAdapterTest is DSTest {
         TestUser pal = new TestUser(nft, ptr);
         assertEq(nft.balanceOf(address(pal)), 0);
 
-        usr.join(tokenId);
+        usr.join(urn, tokenId);
         usr.exit(tokenId, address(pal));
 
         assertEq(nft.balanceOf(address(pal)), 1);
+    }
+
+    function test_open_join() public {
+        TestUser pal = new TestUser(nft, ptr);
+        uint256 newToken = tokenId + 1;
+        nft.mint(address(pal), newToken);
+        pal.approve(address(ptr), newToken);
+
+        pal.join(urn, newToken);
+
+        assertEq(vat.gem(ilkName(kin, uint160(newToken)), urn), ONE);
     }
 
     // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
