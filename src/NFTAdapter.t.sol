@@ -65,10 +65,10 @@ contract NFTAdapterTest is DSTest {
 
     function setUp() public {
         vat = new Vat();
-        ilk = ilkName(kin, uint160(tokenId));
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
         ptr = new NFTAdapter(address(vat), kin, address(gem));
+        ilk = ptr.ilkName(kin, uint160(tokenId));
         usr = new TestUser(nft, ptr);
         urn = bytes32(bytes20(address(usr)));
 
@@ -104,7 +104,7 @@ contract NFTAdapterTest is DSTest {
 
         pal.join(urn, newToken);
 
-        assertEq(vat.gem(ilkName(kin, uint160(newToken)), urn), ONE);
+        assertEq(vat.gem(ptr.ilkName(kin, uint160(newToken)), urn), ONE);
     }
 
     function test_exit_gift() public {
@@ -123,11 +123,5 @@ contract NFTAdapterTest is DSTest {
         usr.join(urn, tokenId);
 
         pal.exit(tokenId, address(pal));
-    }
-
-    // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
-    // a bug in hevm around `library` contracts and inheritance.
-    function ilkName(bytes12 kin, uint256 obj) internal pure returns (bytes32 ilk) {
-        ilk = bytes32(uint256(bytes32(kin)) + uint256(uint160(obj)));
     }
 }
