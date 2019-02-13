@@ -32,19 +32,19 @@ contract TestUser {
         ptr = ptr_;
     }
 
-    function approve(address to, uint256 tokenId) public {
-        nft.approve(to, tokenId);
+    function approve(address to, uint256 tokenID) public {
+        nft.approve(to, tokenID);
     }
 
-    function join(bytes32 urn, uint256 tokenId) public {
-        ptr.join(urn, tokenId);
+    function join(bytes32 urn, uint256 tokenID) public {
+        ptr.join(urn, tokenID);
     }
 
-    function exit(uint256 tokenId, address pal) public {
-        ptr.exit(bytes32(bytes20(address(this))), pal, tokenId);
+    function exit(uint256 tokenID, address pal) public {
+        ptr.exit(bytes32(bytes20(address(this))), pal, tokenID);
     }
 
-    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data) external returns(bytes4) {
+    function onERC721Received(address _operator, address _from, uint256 _tokenID, bytes calldata _data) external returns(bytes4) {
       return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
     }
 }
@@ -61,21 +61,21 @@ contract NFTAdapterTest is DSTest {
 
     bytes12 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
-    uint256 tokenId = 42;
+    uint256 tokenID = 42;
 
     function setUp() public {
         vat = new Vat();
         nft = new ERC721Mintable();
         gem = GemLike(address(nft));
         ptr = new NFTAdapter(address(vat), kin, address(gem));
-        ilk = ptr.ilkName(kin, tokenId);
+        ilk = ptr.ilkName(kin, tokenID);
         usr = new TestUser(nft, ptr);
         urn = bytes32(bytes20(address(usr)));
 
         vat.init(ilk);
         vat.rely(address(ptr));
-        nft.mint(address(usr), tokenId);
-        usr.approve(address(ptr), tokenId);
+        nft.mint(address(usr), tokenID);
+        usr.approve(address(ptr), tokenID);
     }
 
     function test_balance() public {
@@ -83,13 +83,13 @@ contract NFTAdapterTest is DSTest {
         assertEq(nft.balanceOf(address(ptr)), 0);
         assertEq(vat.gem(ilk, urn), 0);
 
-        usr.join(urn, tokenId);
+        usr.join(urn, tokenID);
 
         assertEq(nft.balanceOf(address(usr)), 0);
         assertEq(nft.balanceOf(address(ptr)), 1);
         assertEq(vat.gem(ilk, urn), ONE);
 
-        usr.exit(tokenId, address(usr));
+        usr.exit(tokenID, address(usr));
 
         assertEq(nft.balanceOf(address(usr)), 1);
         assertEq(nft.balanceOf(address(ptr)), 0);
@@ -98,21 +98,21 @@ contract NFTAdapterTest is DSTest {
 
     function test_open_join() public {
         TestUser pal = new TestUser(nft, ptr);
-        tokenId++;
-        nft.mint(address(pal), tokenId);
-        pal.approve(address(ptr), tokenId);
+        tokenID++;
+        nft.mint(address(pal), tokenID);
+        pal.approve(address(ptr), tokenID);
 
-        pal.join(urn, tokenId);
+        pal.join(urn, tokenID);
 
-        assertEq(vat.gem(ptr.ilkName(kin, tokenId), urn), ONE);
+        assertEq(vat.gem(ptr.ilkName(kin, tokenID), urn), ONE);
     }
 
     function test_exit_gift() public {
         TestUser pal = new TestUser(nft, ptr);
         assertEq(nft.balanceOf(address(pal)), 0);
 
-        usr.join(urn, tokenId);
-        usr.exit(tokenId, address(pal));
+        usr.join(urn, tokenID);
+        usr.exit(tokenID, address(pal));
 
         assertEq(nft.balanceOf(address(pal)), 1);
     }
@@ -120,12 +120,12 @@ contract NFTAdapterTest is DSTest {
 
     function testFail_exit_steal() public {
         TestUser pal = new TestUser(nft, ptr);
-        usr.join(urn, tokenId);
+        usr.join(urn, tokenID);
 
-        pal.exit(tokenId, address(pal));
+        pal.exit(tokenID, address(pal));
     }
 
-    function testFail_tokenId_overflow() public {
+    function testFail_tokenID_overflow() public {
         usr.join(urn, 2 ** 160);
     }
 }
