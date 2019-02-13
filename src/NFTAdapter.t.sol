@@ -61,7 +61,7 @@ contract NFTAdapterTest is DSTest {
 
     bytes12 constant kin     = "fnord";
     uint256 constant ONE     = 10 ** 45;
-    uint256 constant tokenId = 42;
+    uint256 tokenId = 42;
 
     function setUp() public {
         vat = new Vat();
@@ -98,13 +98,13 @@ contract NFTAdapterTest is DSTest {
 
     function test_open_join() public {
         TestUser pal = new TestUser(nft, ptr);
-        uint256 newToken = tokenId + 1;
-        nft.mint(address(pal), newToken);
-        pal.approve(address(ptr), newToken);
+        tokenId++;
+        nft.mint(address(pal), tokenId);
+        pal.approve(address(ptr), tokenId);
 
-        pal.join(urn, newToken);
+        pal.join(urn, tokenId);
 
-        assertEq(vat.gem(ptr.ilkName(kin, newToken), urn), ONE);
+        assertEq(vat.gem(ptr.ilkName(kin, tokenId), urn), ONE);
     }
 
     function test_exit_gift() public {
