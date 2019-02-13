@@ -96,16 +96,6 @@ contract NFTAdapterTest is DSTest {
         assertEq(vat.gem(ilk, urn), 0);
     }
 
-    function test_gift() public {
-        TestUser pal = new TestUser(nft, ptr);
-        assertEq(nft.balanceOf(address(pal)), 0);
-
-        usr.join(urn, tokenId);
-        usr.exit(tokenId, address(pal));
-
-        assertEq(nft.balanceOf(address(pal)), 1);
-    }
-
     function test_open_join() public {
         TestUser pal = new TestUser(nft, ptr);
         uint256 newToken = tokenId + 1;
@@ -115,6 +105,24 @@ contract NFTAdapterTest is DSTest {
         pal.join(urn, newToken);
 
         assertEq(vat.gem(ilkName(kin, uint160(newToken)), urn), ONE);
+    }
+
+    function test_exit_gift() public {
+        TestUser pal = new TestUser(nft, ptr);
+        assertEq(nft.balanceOf(address(pal)), 0);
+
+        usr.join(urn, tokenId);
+        usr.exit(tokenId, address(pal));
+
+        assertEq(nft.balanceOf(address(pal)), 1);
+    }
+
+
+    function testFail_exit_steal() public {
+        TestUser pal = new TestUser(nft, ptr);
+        usr.join(urn, tokenId);
+
+        pal.exit(tokenId, address(pal));
     }
 
     // NOTE: Ideally we would inherit this from NFTAdapter, but we can't due to
