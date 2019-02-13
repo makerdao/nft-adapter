@@ -124,4 +124,8 @@ contract NFTAdapterTest is DSTest {
 
         pal.exit(tokenId, address(pal));
     }
+
+    function testFail_tokenId_overflow() public {
+        usr.join(urn, 2 ** 160);
+    }
 }
