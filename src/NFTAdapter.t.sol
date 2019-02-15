@@ -43,10 +43,6 @@ contract TestUser {
     function exit(uint256 tokenID, address pal) public {
         ptr.exit(bytes32(bytes20(address(this))), pal, tokenID);
     }
-
-    function onERC721Received(address _operator, address _from, uint256 _tokenID, bytes calldata _data) external returns(bytes4) {
-      return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
-    }
 }
 
 contract NFTAdapterTest is DSTest {
@@ -116,7 +112,6 @@ contract NFTAdapterTest is DSTest {
 
         assertEq(nft.balanceOf(address(pal)), 1);
     }
-
 
     function testFail_exit_steal() public {
         TestUser pal = new TestUser(nft, ptr);
