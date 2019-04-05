@@ -62,10 +62,10 @@ contract NFTAdapter is DSNote {
         vat.slip(ilkName(kin, obj), urn,  1);
     }
 
-    function exit(address guy, uint256 obj) external note {
+    function exit(address usr, uint256 obj) external note {
         require(uint256(uint160(obj)) == obj, "obj-overflow");
 
-        gem.transferFrom(address(this), guy, obj);
+        gem.transferFrom(address(this), usr, obj);
         vat.slip(ilkName(kin, obj), msg.sender, -1);
     }
 
